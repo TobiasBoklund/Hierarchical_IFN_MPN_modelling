@@ -1,0 +1,1 @@
+The calculations are done in the .ipynb files, while the .jl files contain functions. The main script is called "main script", while "main script - pseudodata" contains a version of the main script that generates pseudodata and makes the same calculations as the main script, but on pseudodata instead of real data.
