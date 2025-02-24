@@ -1,7 +1,7 @@
 """
 model_infer_dynamics_post_Hierarchical(VAF,df_p,effect,p,master_curve,estInitJAK=true)
 
-    Model function for infering VAF dynamics in ProbProgenitor model post hierarchical using Turing
+    Model function for infering VAF dynamics in the model post hierarchical using Turing
 
     Input:
     VAF: Vector with VAF data for given patient
@@ -47,8 +47,8 @@ model_infer_dynamics_post_Hierarchical(VAF,df_p,effect,p,master_curve,estInitJAK
         rho1 ~ Uniform(0,4)
         rho2 ~ Uniform(0,1)
     elseif effect == "py0dy1"
-        rho1 ~ truncated(Normal(0.0403, 0.283), lower=0.0)
-        rho2 ~ truncated(Normal(0.0703, 0.313), lower=0.0)
+        rho1 ~ truncated(Normal(0.0402, 0.283), lower=0.0)
+        rho2 ~ truncated(Normal(0.0684, 0.312), lower=0.0)
     elseif effect == "dy0py1"
         rho1 ~ Uniform(0,1)
         rho2 ~ Uniform(0,4)

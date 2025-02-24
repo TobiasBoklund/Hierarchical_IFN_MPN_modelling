@@ -1,7 +1,7 @@
 """
 model_infer_dynamics(VAF,df_p,effect,p,master_curve,estInitJAK=true)
 
-    Model function for infering VAF dynamics in ProbProgenitor model using Turing
+    Model function for infering VAF dynamics in the model using Turing
 
     Input:
     VAF: Vector with VAF data for given patient
