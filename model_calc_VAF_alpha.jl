@@ -22,7 +22,7 @@ Input:
 
     VAF: Vector containing the VAF at the time points in pDays
 """
-function model_calc_VAF(theta,df_p,effect,pDays,p,master_curve,initJAK)
+function model_calc_VAF_alpha(theta,df_p,effect,pDays,p,master_curve,initJAK)
     # Extract dosing
     pDosing = df_p[:,[:days,:IFN,:RUX]]
 
@@ -30,17 +30,21 @@ function model_calc_VAF(theta,df_p,effect,pDays,p,master_curve,initJAK)
     if effect == "sy0dy1" || effect == "py0py1" || effect == "dy0dy1" || effect == "py0dy0" || effect == "py0dy1" || effect == "dy0py1" || effect == "py1dy1"
         rho1 = theta[1]
         rho2 = theta[2]
+        alpha = theta[3]
     elseif effect == "dy1" || effect == "py0" || effect == "py1" || effect == "dy0" || effect == "dy1IFN"
         rho1 = theta[1]
+        alpha = theta[2]
     elseif effect == "py0py1dy0" || effect == "py0py1dy1" || effect == "py1dy0dy1" || effect == "py0dy0dy1" || effect == "COMBI_py0dy1"
         rho1 = theta[1]
         rho2 = theta[2]
         rho3 = theta[3]
+        alpha = theta[4]
     elseif effect == "py0py1dy0dy1"
         rho1 = theta[1]
         rho2 = theta[2]
         rho3 = theta[3]
         rho4 = theta[4]
+        alpha = theta[5]
     end
 
     # Update parameter tuple
@@ -95,17 +99,7 @@ function model_calc_VAF(theta,df_p,effect,pDays,p,master_curve,initJAK)
         y20 = (master_curve.y2[ID]-master_curve.y2[ID-1])/(t2-t1)*(tstar-t1)+master_curve.y2[ID-1]
         a0 = (master_curve.a[ID]-master_curve.a[ID-1])/(t2-t1)*(tstar-t1)+master_curve.a[ID-1]
         s0 = (master_curve.s[ID]-master_curve.s[ID-1])/(t2-t1)*(tstar-t1)+master_curve.s[ID-1]
-    else
-        x00 = master_curve.x0[end]
-        x10 = master_curve.x1[end]
-        x20 = master_curve.x2[end]
-        y00 = master_curve.y0[end]
-        y10 = master_curve.y1[end]
-        y20 = master_curve.y2[end]
-        a0 = master_curve.a[end]
-        s0 = master_curve.s[end]
     end
-
 
     # Collect in one vector
     u0 = [x00,x10,x20,y00,y10,y20,a0,s0]
@@ -129,7 +123,7 @@ function model_calc_VAF(theta,df_p,effect,pDays,p,master_curve,initJAK)
     y2 = sol[6,:]
     a = sol[7,:]
     s = sol[8,:]
-    VAF = y2./(x2+y2)
+    VAF = (alpha*y2+1/2*(1-alpha)*y2)./(x2+y2)
 
     # Return VAF
     return VAF, sol

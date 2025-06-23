@@ -78,10 +78,15 @@ function model_rhs_treatment(du, u, p, t)
         rho2 = p.rho2
     elseif effect == "dy1" || effect == "py0" || effect == "py1" || effect == "dy0" || effect == "dy1IFN"
         rho1 = p.rho1
-    elseif effect == "COMBI_py0dy1"
+    elseif effect == "py0py1dy0" || effect == "py0py1dy1" || effect == "py1dy0dy1" || effect == "py0dy0dy1" || effect == "COMBI_py0dy1"
         rho1 = p.rho1
         rho2 = p.rho2
         rho3 = p.rho3
+    elseif effect == "py0py1dy0dy1"
+        rho1 = p.rho1
+        rho2 = p.rho2
+        rho3 = p.rho3
+        rho4 = p.rho4
     end
 
     # Extract dose at current time point
@@ -128,9 +133,30 @@ function model_rhs_treatment(du, u, p, t)
     elseif effect == "py1dy1"
         py1 = (1-2*(1/(1+exp(-rho1*cnowI))-1/2))*py1
         dy1 = (1+rho2*cnowI)*dy1
+    elseif effect == "py0py1dy0"
+        py0 = (1-2*(1/(1+exp(-rho1*cnowI))-1/2))*py0
+        py1 = (1-2*(1/(1+exp(-rho2*cnowI))-1/2))*py1
+        dy0 = rho1*cnowI*1/500
+    elseif effect == "py0py1dy1"
+        py0 = (1-2*(1/(1+exp(-rho1*cnowI))-1/2))*py0
+        py1 = (1-2*(1/(1+exp(-rho2*cnowI))-1/2))*py1
+        dy1 = (1+rho2*cnowI)*dy1
+    elseif effect == "py1dy0dy1"
+        py1 = (1-2*(1/(1+exp(-rho2*cnowI))-1/2))*py1
+        dy0 = rho1*cnowI*1/500
+        dy1 = (1+rho2*cnowI)*dy1
+    elseif effect == "py0dy0dy1"
+        py0 = (1-2*(1/(1+exp(-rho1*cnowI))-1/2))*py0
+        dy0 = rho1*cnowI*1/500
+        dy1 = (1+rho2*cnowI)*dy1
     elseif effect == "COMBI_py0dy1"
         py0 = (1-2*(1/(1+exp(-rho1*cnowI))-1/2))*py0
         dy1 = (1+rho2*cnowI+rho3*cnowR)*dy1
+    elseif effect == "py0py1dy0dy1"
+        py0 = (1-2*(1/(1+exp(-rho1*cnowI))-1/2))*py0
+        py1 = (1-2*(1/(1+exp(-rho2*cnowI))-1/2))*py1
+        dy0 = rho1*cnowI*1/500
+        dy1 = (1+rho2*cnowI)*dy1
     end
 
     # Calculate crowding functions phi_x and phi_y

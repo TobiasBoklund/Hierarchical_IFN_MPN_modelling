@@ -1,7 +1,7 @@
-s"""
-model_infer_dynamics(VAF,df_p,effect,p,master_curve,estInitJAK=true)
+"""
+model_infer_dynamics_alpha(VAF,df_p,effect,p,master_curve,estInitJAK=true)
 
-    Model function for infering VAF dynamics in the model using Turing
+    Model function for infering VAF dynamics in the model using Turing - with alpha determining fraction of homozygous mutated cells
 
     Input:
     VAF: Vector with VAF data for given patient
@@ -22,75 +22,93 @@ model_infer_dynamics(VAF,df_p,effect,p,master_curve,estInitJAK=true)
 
     ab: Vector containing the VAF at the time points in pDays
 """
-@model function model_infer_dynamics(VAF,df_p,effect,p,master_curve,estInitJAK=true)
+@model function model_infer_dynamics_alpha(VAF,df_p,effect,p,master_curve,estInitJAK=true)
     # Parameters - prior distributions
     if effect == "sy0dy1"
         rho1 ~ Uniform(0,4)
         rho2 ~ Uniform(0,2)
+        alpha ~ Uniform(0,1)
     elseif effect == "dy1"
         rho1 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "py0py1"
         rho1 ~ Uniform(0,1)
         rho2 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "py0"
         rho1 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "py1"
         rho1 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "dy0dy1"
         rho1 ~ Uniform(0,1)
         rho2 ~ Uniform(0,1) 
+        alpha ~ Uniform(0,1)
     elseif effect == "dy0"
         rho1 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "dy1IFN"
         rho1 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "py0dy0"
         rho1 ~ Uniform(0,1)
         rho2 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "py0dy1"
         rho1 ~ Uniform(0,1)
         rho2 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "dy0py1"
         rho1 ~ Uniform(0,1)
         rho2 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "py1dy1"
         rho1 ~ Uniform(0,1)
         rho2 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "py0py1dy0"
         rho1 ~ Uniform(0,1)
         rho2 ~ Uniform(0,1)
         rho3 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "py0py1dy1"
         rho1 ~ Uniform(0,1)
         rho2 ~ Uniform(0,1)
         rho3 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "py1dy0dy1"
         rho1 ~ Uniform(0,1)
         rho2 ~ Uniform(0,1)
         rho3 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "py0dy0dy1"
         rho1 ~ Uniform(0,1)
         rho2 ~ Uniform(0,1)
         rho3 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "py0py1dy0dy1"
         rho1 ~ Uniform(0,1)
         rho2 ~ Uniform(0,1)
         rho3 ~ Uniform(0,1)
         rho4 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     elseif effect == "COMBI_py0dy1"
         rho1 ~ Uniform(0,1)
         rho2 ~ Uniform(0,1)
         rho3 ~ Uniform(0,1)
+        alpha ~ Uniform(0,1)
     end
 
     # Collect in one vector
     if effect == "sy0dy1" || effect == "py0py1" || effect == "dy0dy1" || effect == "py0dy0" || effect == "py0dy1" || effect == "dy0py1" || effect == "py1dy1"
-        rho = [rho1, rho2]
+        rho = [rho1, rho2, alpha]
     elseif effect == "dy1" || effect == "py0" || effect == "py1" || effect == "dy0" || effect == "dy1IFN"
-        rho = rho1
+        rho = [rho1, alpha]
     elseif effect == "py0py1dy0" || effect == "py0py1dy1" || effect == "py1dy0dy1" || effect == "py0dy0dy1" || effect == "COMBI_py0dy1"
-        rho = [rho1, rho2, rho3]
+        rho = [rho1, rho2, rho3, alpha]
     elseif effect == "py0py1dy0dy1"
-        rho = [rho1, rho2, rho3, rho4]
+        rho = [rho1, rho2, rho3, rho4, alpha]
     end
 
     # Distribution for init_JAK if wanted
@@ -106,7 +124,7 @@ model_infer_dynamics(VAF,df_p,effect,p,master_curve,estInitJAK=true)
     pDays = pDays[.!isnan.(df_p.JAK)]
 
     # Solve model with treatment
-    model_VAF, sol = model_calc_VAF(rho,df_p,effect,pDays,p,master_curve,initJAK)
+    model_VAF, sol = model_calc_VAF_alpha(rho,df_p,effect,pDays,p,master_curve,initJAK)
 
     # Error standard deviation
     sigma ~ truncated(Cauchy(0,0.3), lower=0.0, upper=1.0)
