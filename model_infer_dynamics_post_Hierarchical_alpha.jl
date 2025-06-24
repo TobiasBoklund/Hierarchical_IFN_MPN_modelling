@@ -103,7 +103,7 @@ model_infer_dynamics_post_Hierarchical(VAF,df_p,effect,p,master_curve,estInitJAK
 
     # Statistical model for errors
     for i in eachindex(VAF)
-        VAF[i] ~ Normal(model_VAF[i], sigma)
+        VAF[i] ~ truncated(Normal(model_VAF[i], sigma), lower=0.0, upper=1.0)
     end
 
 end
